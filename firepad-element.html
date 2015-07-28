@@ -8,6 +8,7 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="ace-behavior.html">
 
 <dom-module id="firepad-element">
 
@@ -54,16 +55,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         notify: true,
         reflectToAttribute: true
       },
-      nowrap: {
-        type: Boolean,
-        value: true,
-        notify: true
-      },
-      useworker: {
-        type: Boolean,
-        value: false,
-        notify: true
-      },
       height: {
         type: String,
         value: '200',
@@ -72,16 +63,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       title: {
         type: String,
         value: "Default",
-        notify: true
-      },
-      theme: {
-        type: String,
-        value: "light",
-        notify: true
-      },
-      mode: {
-        type: String,
-        value: "javascript",
         notify: true
       },
       options: {
@@ -95,6 +76,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     },
 
+    behaviors: [FirepadBehaviors.AceBehavior],
+
     // Element Lifecycle
 
     ready: function() {
@@ -103,46 +86,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       //// Initialize Firebase.
       var firepadRef = new Firebase(this.location);
       // Create editor
-      var editor = this._createEditor('firepad-container', this.theme);
+      var editor = this._createEditor('firepad-container');
       // Edit session based on attributes
-      var session = this._editSession(editor, this.nowrap, this.useWorker);
+      var session = this._editSession(editor);
       //// Create Firepad.
       var firepad = Firepad.fromACE(firepadRef, editor, this.options);
-    },
-
-    attached: function(){
-
-    },
-
-    _createEditor: function(containerName, themeName){
-      //// Create ACE
-      var editor = ace.edit(containerName);
-      // set theme based on attrubute
-      if (themeName == "dark") editor.setTheme("ace/theme/monokai");
-      else editor.setTheme("ace/theme/textmate");
-      return editor;
-    },
-
-    _editSession: function(editor, wrap, useWorker){
-      var session = editor.getSession();
-      // set wrap based on attribute
-      session.setUseWrapMode(wrap);
-      // set worker based on attribute
-      session.setUseWorker(useWorker);
-      // set mode based on attribute
-      this._setMode(session, this.mode);
-      return session;
-    },
-
-    _setMode: function(session, modeName){
-      var fullMode = "ace/mode/" + modeName;
-      session.setMode(fullMode);
-    }
-
-    _wrapModeChanged: function(){
-      var editor = ace.edit('firepad-container');
-      var session = editor.getSession();
-      session.setUseWrapMode(this.nowrap);
     }
 
   });

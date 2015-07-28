@@ -1,0 +1,60 @@
+<!-- Behavior for setting up an ace editor -->
+
+<script>
+  var FirepadBehaviors = FirepadBehaviors || {};
+  FirepadBehaviors.AceBehavior = {
+    properties: {
+      theme: {
+        type: String,
+        value: "light",
+        notify: true
+      },
+      mode: {
+        type: String,
+        value: "javascript",
+        notify: true
+      },
+      nowrap: {
+        type: Boolean,
+        value: true,
+        notify: true
+      },
+      useworker: {
+        type: Boolean,
+        value: false,
+        notify: true
+      },
+    },
+
+    _createEditor: function(containerName){
+      //// Create ACE
+      var editor = ace.edit(containerName);
+      // set theme based on attrubute
+      if (this.theme == "dark") editor.setTheme("ace/theme/monokai");
+      else editor.setTheme("ace/theme/textmate");
+      return editor;
+    },
+
+    _editSession: function(editor){
+      var session = editor.getSession();
+      // set wrap based on attribute
+      session.setUseWrapMode(this.nowrap);
+      // set worker based on attribute
+      session.setUseWorker(this.useworker);
+      // set mode based on attribute
+      this._setMode(session);
+      return session;
+    },
+
+    _setMode: function(session){
+      var fullMode = "ace/mode/" + this.mode;
+      session.setMode(fullMode);
+    },
+
+    _wrapModeChanged: function(){
+      var editor = ace.edit('firepad-container');
+      var session = editor.getSession();
+      session.setUseWrapMode(this.nowrap);
+    }
+  };
+</script>
