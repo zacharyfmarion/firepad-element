@@ -1,8 +1,6 @@
 <!-- Behavior for setting up an ace editor...
-
      TODO: Make a class to pass an object with all options into,
      or use one provided by ace (too many separate attributes)
-
 -->
 
 <script>
@@ -18,7 +16,6 @@
         value: "light",
         notify: true
       },
-
       /**
        * Mode that the editor will be set to...for example 'javascript'
        *  or 'css'. Currently only supports css, js, and html
@@ -28,7 +25,6 @@
         value: "javascript",
         notify: true
       },
-
       /**
        * Determines whether text in the ace editor wraps
        */
@@ -37,7 +33,18 @@
         value: false,
         notify: true
       },
+      /**
+        * Defines options to be passed into the editor.setOptions() method
+        */
+      options: {
+        type: Object,
+        value: function(){
+          return {
 
+          };
+        },
+        notify: true
+      },
       /**
        * Determines whether the ace editor uses a worker
        */
@@ -46,29 +53,31 @@
         value: false,
         notify: true
       },
+      aceEditor: {
+        type: Object,
+        notify: true
+      }
     },
-
     /**
      * Create an instance of the ace editor and set the theme
      * @param {String} Name of the container that will hold the editor
      * @return {Object} Instance of the ace editor created
      */
-
     _createEditor: function(containerName){
       //// Create ACE
       var editor = ace.edit(containerName);
+      this.aceEditor = editor;
       // set theme based on attrubute
       if (this.theme == "dark") editor.setTheme("ace/theme/monokai");
       else editor.setTheme("ace/theme/textmate");
+      editor.setOptions(this.options);
       return editor;
     },
-
     /**
      * Edit an ace session to set wrap, worker, and mode (separate function)
      * @param {Object} The editor instance whose session is being manipulated
      * @return {Object} The ace editor session
      */
-
     _editSession: function(editor){
       var session = editor.getSession();
       // set wrap based on attribute
@@ -79,24 +88,19 @@
       this._setMode(session);
       return session;
     },
-
     /**
      * Set the mode of an ace editor session
      * @param {Object} The ace editor session
      */
-
     _setMode: function(session){
       var fullMode = "ace/mode/" + this.mode;
       session.setMode(fullMode);
     },
-
     /**
-     * Observer function that changes wrap mode on change of the "nowrap" attribute
+     * Observer function that changes wrap mode on change of the "wrap" attribute
      */
-
     _wrapModeChanged: function(){
-      var editor = ace.edit('firepad-container');
-      var session = editor.getSession();
+      var session = this.aceEditor.getSession();
       session.setUseWrapMode(this.wrap);
     }
   };

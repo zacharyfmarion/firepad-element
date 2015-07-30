@@ -13,7 +13,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <dom-module id="firepad-element">
 
   <style>
-
     :host {
       display: block;
       font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -21,20 +20,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       margin:0;
     }
 
-    paper-material{
+    .no-full{
       border-radius: 3px;
       margin: 10px;
     }
 
+    .full{
+      border-radius: 0;
+      margin: 0;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .no-scroll{
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
   </style>
 
   <template>
-    <paper-material elevation = "3">
-      <paper-header-panel class = "flex" mode = "waterfall">
-        <paper-toolbar>
-          <div class="title" contenteditable>{{title}}</div>
-        </paper-toolbar>
-      </paper-header-panel>
+    <paper-material id = "paper-container" class = "no-full" elevation = "3">
+      <paper-toolbar id = "toolbar">
+        <div class="title" contenteditable>{{title}}</div>
+        <paper-button on-tap = 'fullscreenCall'>fullscreen</paper-button>
+      </paper-toolbar>
       <div id="firepad-container"></div>
     </paper-material>
   </template>
@@ -42,13 +54,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </dom-module>
 
 <script>
-
   //TODO: add font-size prop
-
   Polymer({
-
     is: 'firepad-element',
-
     properties: {
       location: {
         type: String,
@@ -69,17 +77,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         type: Object,
         value: function(){
           return {
-
           }
         },
-        nofify: true
+        notify: true
       }
     },
-
+    // Element behaviors
     behaviors: [FirepadBehaviors.AceBehavior],
-
     // Element Lifecycle
-
     ready: function() {
       //change height
       $('#firepad-container').css('height', this.height + 'px');
@@ -91,8 +96,38 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       var session = this._editSession(editor);
       //// Create Firepad.
       var firepad = Firepad.fromACE(firepadRef, editor, this.options);
+    },
+
+    // Clean this up...remove all jquery if possible and use built in Polymer.Base functions
+
+    fullscreenCall: function(){
+      $("#paper-container").toggleClass("no-full");
+      $("#paper-container").toggleClass("full");
+      if ($("#paper-container").hasClass("full")){
+        $('#firepad-container').css({
+          position: 'absolute',
+          top: '0',
+          left: '0',
+          width: '100%'
+        });
+        // Resize the ace editor
+        this._resizeEditor();
+        //Add event listener for window resizing
+        window.addEventListener('resize', this._resizeEditor(), false);
+
+      }else{
+        $('#firepad-container').css({
+          position: 'relative',
+          height: this.height + 'px'
+        });
+        //remove listener for window resizing
+        window.removeEventListener('resize', this._resizeEditor(), false);
+      }
+    },
+    // Private methods
+    _resizeEditor: function(){
+      $('#firepad-container').css('height', (window.innerHeight - $('#toolbar').height()) + 'px');
+      this.aceEditor.resize();
     }
-
   });
-
 </script>
