@@ -43,9 +43,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <template>
     <paper-material id = "paper-container" class = "no-full" elevation = "3">
-      <paper-toolbar id = "toolbar">
+      <paper-toolbar id = "toolbar" hidden$="{{!toolbar}}">
         <div class="title" contenteditable>{{title}}</div>
-        <paper-button on-tap = 'fullscreenCall'>fullscreen</paper-button>
+        <paper-button on-tap = 'toggleFullscreen'>fullscreen</paper-button>
       </paper-toolbar>
       <div id="firepad-container"></div>
     </paper-material>
@@ -54,53 +54,90 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </dom-module>
 
 <script>
-  //TODO: add font-size prop
+  /**
+    * `<firepad-element>` is a wrapper element for firepad, a service that allows for
+    * collaborative cloud editing of documents (in this case using the ace code editor)
+
+    @demo
+
+    @demo demo/index.html  Demo of the element in action
+    */
   Polymer({
     is: 'firepad-element',
     properties: {
+      /**
+       * Location of the firebase database to be used in the firepad element
+       */
       location: {
         type: String,
         notify: true,
         reflectToAttribute: true
       },
+      /**
+       * Height of the editor (only works when not in fullscreen)
+       */
       height: {
         type: String,
         value: '200',
         notify: true
       },
+      /**
+       * Title of the editor
+       */
       title: {
         type: String,
         value: "Default",
         notify: true
       },
+      /**
+       * Options to pass into the firepad element created
+       *
+       * @type {defaultText: string, userId: string, userColor: string}
+       */
       options: {
         type: Object,
         value: function(){
-          return {
-          }
+          return {};
         },
         notify: true
+      },
+      /**
+       * Specifies whether the element will show a toolbar with the element
+       * TODO: Change to dom-if so that it is not created unnecesarilly
+       */
+      toolbar: {
+        type: Boolean,
+        value: false,
+        notify: true
+      },
+      /**
+        * Instance of the firepad element created with _createFirepad
+        */
+      firepadInstance: {
+        type: Object,
+        value: function(){
+          return{};
+        },
+        readonly: true
       }
     },
     // Element behaviors
     behaviors: [FirepadBehaviors.AceBehavior],
-    // Element Lifecycle
+    /**
+     * Change the height to match property and create a firepad instance
+     */
     ready: function() {
-      //change height
+      // Change height
       $('#firepad-container').css('height', this.height + 'px');
-      //// Initialize Firebase.
-      var firepadRef = new Firebase(this.location);
-      // Create editor
-      var editor = this._createEditor('firepad-container');
-      // Edit session based on attributes
-      var session = this._editSession(editor);
-      //// Create Firepad.
-      var firepad = Firepad.fromACE(firepadRef, editor, this.options);
+      // Create the firepad instance and set it equal to the instance property
+      this.firepadInstance = this._createFirepad();
     },
 
-    // Clean this up...remove all jquery if possible and use built in Polymer.Base functions
-
-    fullscreenCall: function(){
+    /**
+     * Enters or exits fullscreen, depending on the classes present
+     * TODO: Remove jquery altogether (fewer dependencies = better)
+     */
+    toggleFullscreen: function(){
       $("#paper-container").toggleClass("no-full");
       $("#paper-container").toggleClass("full");
       if ($("#paper-container").hasClass("full")){
@@ -130,7 +167,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           position: 'relative',
           height: this.height + 'px'
         });
-
+        //TODO: make firepad resize back when fullscreen toggled
         $('#firepad-container').css({
           position: 'relative',
           display: 'block'
@@ -140,8 +177,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         window.removeEventListener('resize', this._resizeEditor(), false);
       }
     },
+
     // Private methods
 
+    /**
+     * Creates the firepad using methods from FirepadBehaviors.AceBehavior
+     *
+     * @return {Object} The firepad object created
+     */
+    _createFirepad: function(){
+      //// Initialize Firebase.
+      var firepadRef = new Firebase(this.location);
+      // Create editor
+      var editor = this._createEditor('firepad-container');
+      // Edit session based on attributes
+      var session = this._editSession(editor);
+      //// Create Firepad.
+      var firepad = Firepad.fromACE(firepadRef, editor, this.options);
+      return firepad;
+    },
+
+    /**
+     * Resized the ace editor
+     */
     _resizeEditor: function(){
       $('.firepad').css('height', (window.innerHeight - $('#toolbar').height()) + 'px');
       this.aceEditor.resize();
