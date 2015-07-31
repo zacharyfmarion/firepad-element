@@ -66,7 +66,7 @@ are so inclined.
         */
       aceEditor: {
         type: Object,
-        notify: true
+        readonly: true
       }
     },
     /**
@@ -79,7 +79,9 @@ are so inclined.
       //// Create ACE
       var editor = ace.edit(containerName);
       this.aceEditor = editor;
-      // set theme based on attrubute
+      // Prevent error message
+      editor.$blockScrolling = Infinity;
+      // Set theme based on attrubute
       if (this.theme == "dark") editor.setTheme("ace/theme/monokai");
       else editor.setTheme("ace/theme/textmate");
       editor.setOptions(this.options);
