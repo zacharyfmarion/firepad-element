@@ -18,7 +18,7 @@
   "serverPort": null,
   "simpleModePartnerServer": null,
   "templateDefaultLayout": "layout",
-  "templateDefaultPage": "index",
+  "templateDefaultPage": "demo/index",
   "templateDirectory": "demo",
   "type": "simple",
   "useCompass": false

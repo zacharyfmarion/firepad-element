@@ -1,0 +1,22 @@
+{
+  "name": "firepad-element",
+  "version": "1.0.0",
+  "description": "A wrapper element for Firepad with Polymer",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zacharyfmarion/firepad-element.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zacharyfmarion/firepad-element/issues"
+  },
+  "homepage": "https://github.com/zacharyfmarion/firepad-element#readme"
+}
